@@ -1,6 +1,6 @@
 # Telegram Form Notifications
 
-This repository contains a Google Apps Script that sends a notification to a Telegram chat whenever a Google Form response is submitted. The configuration for the Telegram Bot API token, form responses sheet name, and custom title are stored in a Google Sheets settings sheet.
+This repository contains a generalized Google Apps Script designed to send notifications to a Telegram chat whenever a Google Form response is submitted. The script retrieves configuration settings such as the Telegram Bot API token, the name of the form responses sheet, and a custom title for the notifications from a settings sheet in Google Sheets. This makes the setup flexible and easy to configure for different use cases.
 
 ## Features
 
@@ -26,8 +26,8 @@ This repository contains a Google Apps Script that sends a notification to a Tel
 
 ## Functions
 
-- `sendTelegramNotificationOnFormSubmit(e)`: Sends a notification to Telegram when a form response is submitted.
-- `createInstallableTrigger()`: Creates an installable trigger for form submissions.
+- `sendTelegramNotificationOnFormSubmit(e, spreadsheetId, settingsSheetName, formResponsesSheetNameCell, botApiTokenCell, customTitleCell)`: Sends a notification to Telegram when a form response is submitted.
+- `createInstallableTrigger(formId)`: Creates an installable trigger for form submissions.
 
 ## Example Configuration Sheet
 
