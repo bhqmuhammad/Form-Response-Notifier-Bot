@@ -24,6 +24,9 @@ This repository contains a generalized Google Apps Script designed to send notif
 3. **Set Up Triggers**:
    - Create an installable trigger for form submissions by running the `createInstallableTrigger` function in the script editor.
 
+4. **Include Telegram ID in Form**:
+   - Ensure that your Google Form includes a question for the respondent's Telegram ID. This ID will be used to send the notification to the correct Telegram chat.
+
 ## Functions
 
 - `sendTelegramNotificationOnFormSubmit(e, spreadsheetId, settingsSheetName, formResponsesSheetNameCell, botApiTokenCell, customTitleCell)`: Sends a notification to Telegram when a form response is submitted.
