@@ -1,0 +1,34 @@
+{
+  "name": "form-response-notifier-bot",
+  "version": "1.0.0",
+  "description": "A Google Apps Script bot that sends Telegram notifications when Google Form responses are submitted",
+  "main": "Code.gs",
+  "scripts": {
+    "lint": "echo 'Linting Google Apps Script files...'",
+    "test": "echo 'Running tests...'",
+    "validate": "echo 'Validating configuration...'"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/bhqmuhammad/Form-Response-Notifier-Bot.git"
+  },
+  "keywords": [
+    "google-apps-script",
+    "telegram-bot",
+    "form-notifications",
+    "google-forms",
+    "automation",
+    "notifications"
+  ],
+  "author": "bhqmuhammad",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/bhqmuhammad/Form-Response-Notifier-Bot/issues"
+  },
+  "homepage": "https://github.com/bhqmuhammad/Form-Response-Notifier-Bot#readme",
+  "engines": {
+    "node": ">=14.0.0"
+  },
+  "devDependencies": {},
+  "dependencies": {}
+}

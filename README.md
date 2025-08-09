@@ -1,45 +1,205 @@
 # Form Response Notifier Bot
 
-This repository contains a generalized Google Apps Script designed to send notifications to a Telegram chat whenever a Google Form response is submitted. The script retrieves configuration settings such as the Telegram Bot API token, the name of the form responses sheet, and a custom title for the notifications from a settings sheet in Google Sheets. This makes the setup flexible and easy to configure for different use cases.
+[![MIT License](https://img.shields.io/badge/License-MIT-green.svg)](https://choosealicense.com/licenses/mit/)
+[![Google Apps Script](https://img.shields.io/badge/Google%20Apps%20Script-4285F4?logo=google&logoColor=white)](https://script.google.com/)
+[![Telegram Bot API](https://img.shields.io/badge/Telegram%20Bot%20API-26A5E4?logo=telegram&logoColor=white)](https://core.telegram.org/bots/api)
 
-## Features
+A powerful and flexible Google Apps Script bot that automatically sends Telegram notifications when Google Form responses are submitted. Perfect for real-time form monitoring, event registrations, feedback collection, and more.
 
-- **Automated Notifications**: Automatically sends a Telegram message when a form response is submitted.
-- **Customizable Settings**: Configure the bot API token, form responses sheet name, and custom title via a settings sheet.
-- **Markdown Support**: Messages are sent in Markdown format, allowing for rich text formatting.
-- **Timestamping**: Includes a timestamp of the form submission in the notification message.
-- **Error Handling**: Logs errors and handles chat migrations if necessary.
+## ✨ Features
 
-## Usage
+- **🚀 Automated Notifications**: Instantly receive Telegram messages when forms are submitted
+- **⚙️ Flexible Configuration**: Easy setup through Google Sheets settings
+- **📝 Rich Formatting**: Markdown-formatted messages with customizable titles
+- **🔄 Retry Logic**: Built-in error handling and automatic retry mechanisms
+- **🛡️ Robust Validation**: Comprehensive input validation and error reporting
+- **📊 Multi-Form Support**: Handle multiple forms with different configurations
+- **⏰ Timestamp Tracking**: Automatic timestamp inclusion in notifications
+- **🔧 Developer-Friendly**: Well-documented API and debugging tools
 
-1. **Configuration**: 
-   - Open the Google Sheets document and navigate to the 'Telegram Bot Settings' sheet.
-   - Enter the Telegram Bot API token, form responses sheet name, and custom title in the specified cells.
+## 🚀 Quick Start
 
-2. **Deploy the Script**:
-   - Open the script editor in Google Sheets (`Extensions` > `Apps Script`).
-   - Copy and paste the code from `Code.js` into the script editor.
-   - Save and deploy the script as a web app.
+### 1. Get Your Telegram Bot Token
+1. Message [@BotFather](https://t.me/BotFather) on Telegram
+2. Create a new bot with `/newbot`
+3. Save the provided token
 
-3. **Set Up Triggers**:
-   - Create an installable trigger for form submissions by running the `createInstallableTrigger` function in the script editor.
+### 2. Set Up Google Sheets
+1. Create a new Google Sheets document
+2. Add a sheet named `Telegram Bot Settings`
+3. Configure your settings:
 
-4. **Include Telegram ID in Form**:
-   - Ensure that your Google Form includes a question for the respondent's Telegram ID. This ID will be used to send the notification to the correct Telegram chat.
+| Cell | Setting | Example |
+|------|---------|---------|
+| B1 | Bot Token | `123456789:ABCdefGHIjklMNOpqrsTUVwxyz` |
+| B2 | Form Sheet Name | `Form Responses 1` |
+| B3 | Custom Title | `New Form Submission` |
 
-## Functions
+### 3. Install the Script
+1. Open **Extensions** → **Apps Script** in your Google Sheets
+2. Replace the default code with the contents of [`Code.gs`](Code.gs)
+3. Save the project
 
-- `sendTelegramNotificationOnFormSubmit(e, spreadsheetId, settingsSheetName, formResponsesSheetNameCell, botApiTokenCell, customTitleCell)`: Sends a notification to Telegram when a form response is submitted.
-- `createInstallableTrigger(formId)`: Creates an installable trigger for form submissions.
+### 4. Create Form Trigger
+Run this in the Apps Script console:
+```javascript
+createInstallableTrigger('YOUR_GOOGLE_FORM_ID');
+```
 
-## Example Configuration Sheet
+### 5. Test Your Setup
+```javascript
+testTelegramNotification('YOUR_TELEGRAM_CHAT_ID');
+```
 
-| Setting Name                | Value                        |
-|-----------------------------|------------------------------|
-| Telegram Bot API Token (B1) | YOUR_TELEGRAM_BOT_API_TOKEN  |
-| Form Responses Sheet Name (B2) | Form Responses Sheet |
-| Custom Title (B3)           | New Form Submission          |
+## 📖 Documentation
 
-## License
+- **[📋 Setup Guide](docs/SETUP.md)** - Detailed step-by-step installation instructions
+- **[🔧 API Documentation](docs/API.md)** - Complete function reference and examples
+- **[🛠️ Troubleshooting](docs/TROUBLESHOOTING.md)** - Common issues and solutions
+- **[📝 Contributing](CONTRIBUTING.md)** - How to contribute to this project
 
-This repository is licensed under the MIT License. See the [LICENSE](LICENSE) file for more information.
+## 🏗️ Architecture
+
+The bot is built with a modular architecture for better maintainability:
+
+```
+Code.gs
+├── Configuration Management
+│   ├── loadConfiguration()
+│   └── validateConfiguration()
+├── Form Data Processing
+│   ├── extractFormResponse()
+│   └── buildNotificationMessage()
+├── Telegram Integration
+│   ├── sendTelegramMessage()
+│   └── escapeMarkdown()
+└── Utility Functions
+    ├── createInstallableTrigger()
+    ├── removeAllTriggers()
+    └── testTelegramNotification()
+```
+
+## 🎯 Use Cases
+
+- **Event Registration**: Notify organizers of new registrations
+- **Customer Feedback**: Alert teams to new feedback submissions
+- **Lead Generation**: Instant notifications for new leads
+- **Survey Responses**: Real-time survey completion alerts
+- **Support Requests**: Immediate notification of support tickets
+- **Contest Entries**: Track competition submissions
+- **Volunteer Sign-ups**: Coordinate volunteer activities
+- **RSVP Management**: Event attendance tracking
+
+## ⚡ Advanced Features
+
+### Custom Message Formatting
+Customize message appearance by modifying the `buildNotificationMessage()` function:
+
+```javascript
+function buildNotificationMessage(formData, customTitle) {
+  let message = `🎉 *${customTitle}*\n`;
+  message += `📅 *Time*: ${formatTimestamp(formData.timestamp)}\n\n`;
+  
+  // Add custom emoji mapping
+  const emojiMap = {
+    'Name': '👤',
+    'Email': '📧',
+    'Phone': '📱'
+  };
+  
+  // Custom formatting logic here
+  return message;
+}
+```
+
+### Multiple Forms Support
+Handle different forms with separate configurations:
+
+```javascript
+// Form 1: Registration Form
+sendTelegramNotificationOnFormSubmit(e, spreadsheetId, 'Registration Settings');
+
+// Form 2: Feedback Form  
+sendTelegramNotificationOnFormSubmit(e, spreadsheetId, 'Feedback Settings');
+```
+
+### Error Notification Setup
+Get notified when errors occur:
+
+```javascript
+function sendErrorNotification(error) {
+  const adminChatId = 'ADMIN_TELEGRAM_ID';
+  const errorMessage = `🚨 *Bot Error*\n\`${error.toString()}\``;
+  // Send to admin
+}
+```
+
+## 🔒 Security Best Practices
+
+- **🔐 Token Security**: Never commit bot tokens to public repositories
+- **✅ Input Validation**: All user inputs are validated and sanitized
+- **🛡️ Error Handling**: Comprehensive error handling prevents information leakage
+- **📝 Audit Logging**: All actions are logged for monitoring
+- **🔄 Token Rotation**: Regularly rotate bot tokens for security
+
+## 🤝 Contributing
+
+We welcome contributions! Please see our [Contributing Guide](CONTRIBUTING.md) for details.
+
+### Development Setup
+1. Fork the repository
+2. Create a feature branch
+3. Make your changes
+4. Test thoroughly
+5. Submit a pull request
+
+### Code Standards
+- Follow existing code style and formatting
+- Add comprehensive JSDoc comments
+- Include error handling for all external calls
+- Write meaningful commit messages
+
+## 📊 Project Stats
+
+- **Language**: Google Apps Script (JavaScript)
+- **Dependencies**: None (uses built-in Google Apps Script services)
+- **API Integrations**: Google Forms, Google Sheets, Telegram Bot API
+- **License**: MIT
+- **Maintenance**: Active
+
+## 🆘 Support
+
+- **📋 Issues**: [GitHub Issues](https://github.com/bhqmuhammad/Form-Response-Notifier-Bot/issues)
+- **📖 Docs**: Check the [documentation](docs/) first
+- **🛠️ Troubleshooting**: See [troubleshooting guide](docs/TROUBLESHOOTING.md)
+- **💬 Discussions**: Use GitHub Discussions for questions
+
+## 📈 Roadmap
+
+- [ ] **Multi-language support** for notification messages
+- [ ] **Template system** for custom message formats
+- [ ] **Webhook integration** for external services
+- [ ] **Analytics dashboard** for form submission tracking
+- [ ] **Conditional notifications** based on form responses
+- [ ] **File attachment support** for form uploads
+- [ ] **Group chat support** for team notifications
+
+## 📜 License
+
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+
+## 🙏 Acknowledgments
+
+- Google Apps Script team for the excellent platform
+- Telegram Bot API for simple and powerful messaging
+- The open source community for inspiration and feedback
+
+---
+
+<div align="center">
+
+**[⭐ Star this repo](https://github.com/bhqmuhammad/Form-Response-Notifier-Bot)** if you find it useful!
+
+Made with ❤️ by [bhqmuhammad](https://github.com/bhqmuhammad)
+
+</div>
