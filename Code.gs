@@ -13,7 +13,8 @@ const CONFIG = {
   DEFAULT_CELLS: {
     BOT_TOKEN: 'B1',
     SHEET_NAME: 'B2', 
-    CUSTOM_TITLE: 'B3'
+    CUSTOM_TITLE: 'B3',
+    CONDITIONS: 'B4'
   },
   TELEGRAM_API_BASE: 'https://api.telegram.org/bot',
   MAX_RETRY_ATTEMPTS: 3,
@@ -41,8 +42,9 @@ const ERRORS = {
  * @param {string} [formResponsesSheetNameCell] - Optional cell reference for form sheet name (defaults to CONFIG.DEFAULT_CELLS.SHEET_NAME)
  * @param {string} [botApiTokenCell] - Optional cell reference for bot token (defaults to CONFIG.DEFAULT_CELLS.BOT_TOKEN)
  * @param {string} [customTitleCell] - Optional cell reference for custom title (defaults to CONFIG.DEFAULT_CELLS.CUSTOM_TITLE)
+ * @param {string} [conditionsCell] - Optional cell reference for conditions (defaults to CONFIG.DEFAULT_CELLS.CONDITIONS)
  */
-function sendTelegramNotificationOnFormSubmit(e, spreadsheetId, settingsSheetName, formResponsesSheetNameCell, botApiTokenCell, customTitleCell) {
+function sendTelegramNotificationOnFormSubmit(e, spreadsheetId, settingsSheetName, formResponsesSheetNameCell, botApiTokenCell, customTitleCell, conditionsCell) {
   try {
     console.log("Form submission trigger activated");
     console.log("Event object:", JSON.stringify(e));
@@ -53,7 +55,8 @@ function sendTelegramNotificationOnFormSubmit(e, spreadsheetId, settingsSheetNam
       settingsSheetName: settingsSheetName || CONFIG.DEFAULT_SETTINGS_SHEET,
       formResponsesSheetNameCell: formResponsesSheetNameCell || CONFIG.DEFAULT_CELLS.SHEET_NAME,
       botApiTokenCell: botApiTokenCell || CONFIG.DEFAULT_CELLS.BOT_TOKEN,
-      customTitleCell: customTitleCell || CONFIG.DEFAULT_CELLS.CUSTOM_TITLE
+      customTitleCell: customTitleCell || CONFIG.DEFAULT_CELLS.CUSTOM_TITLE,
+      conditionsCell: conditionsCell || CONFIG.DEFAULT_CELLS.CONDITIONS
     };
 
     // Load and validate configuration
@@ -63,6 +66,12 @@ function sendTelegramNotificationOnFormSubmit(e, spreadsheetId, settingsSheetNam
     // Extract form response data
     const formData = extractFormResponse(e, settings.formResponsesSheetName, config.spreadsheetId);
     console.log("Form data extracted:", JSON.stringify(formData));
+
+    // Check conditions
+    if (!shouldSendNotification(formData, settings.conditions)) {
+      console.log("Notification skipped due to conditions not met.");
+      return;
+    }
 
     // Build and send notification message
     const message = buildNotificationMessage(formData, settings.customTitle);
@@ -99,7 +108,8 @@ function loadConfiguration(config) {
   const settings = {
     botApiToken: settingsSheet.getRange(config.botApiTokenCell).getValue(),
     formResponsesSheetName: settingsSheet.getRange(config.formResponsesSheetNameCell).getValue(),
-    customTitle: settingsSheet.getRange(config.customTitleCell).getValue()
+    customTitle: settingsSheet.getRange(config.customTitleCell).getValue(),
+    conditions: settingsSheet.getRange(config.conditionsCell).getValue()
   };
 
   // Validate required settings
@@ -115,10 +125,50 @@ function loadConfiguration(config) {
   console.log("Settings validated:", {
     hasToken: !!settings.botApiToken,
     sheetName: settings.formResponsesSheetName,
-    title: settings.customTitle
+    title: settings.customTitle,
+    hasConditions: !!settings.conditions
   });
 
   return settings;
+}
+
+/**
+ * Checks if the notification should be sent based on configured conditions.
+ *
+ * @param {Object} formData - The extracted form data
+ * @param {string} conditions - The conditions string from settings
+ * @returns {boolean} True if notification should be sent
+ */
+function shouldSendNotification(formData, conditions) {
+  if (!conditions || conditions.toString().trim() === '') {
+    return true;
+  }
+
+  const conditionLines = conditions.toString().split('\n');
+
+  for (const line of conditionLines) {
+    if (line.trim() === '') continue;
+
+    // Simple format: "Field Name: Value"
+    // Uses first colon as separator to allow colons in values
+    const separatorIndex = line.indexOf(':');
+    if (separatorIndex === -1) {
+      console.warn(`Invalid condition format: ${line}. Ignored.`);
+      continue;
+    }
+
+    const field = line.substring(0, separatorIndex).trim();
+    const expectedValue = line.substring(separatorIndex + 1).trim();
+    const actualValue = formData.responseData[field];
+
+    // If field doesn't exist or value doesn't match
+    if (actualValue === undefined || String(actualValue).trim() !== expectedValue) {
+      console.log(`Condition failed: ${field} expected '${expectedValue}', got '${actualValue}'`);
+      return false;
+    }
+  }
+
+  return true;
 }
 
 /**
@@ -405,7 +455,8 @@ function validateConfiguration(spreadsheetId, settingsSheetName) {
       settingsSheetName: settingsSheetName || CONFIG.DEFAULT_SETTINGS_SHEET,
       formResponsesSheetNameCell: CONFIG.DEFAULT_CELLS.SHEET_NAME,
       botApiTokenCell: CONFIG.DEFAULT_CELLS.BOT_TOKEN,
-      customTitleCell: CONFIG.DEFAULT_CELLS.CUSTOM_TITLE
+      customTitleCell: CONFIG.DEFAULT_CELLS.CUSTOM_TITLE,
+      conditionsCell: CONFIG.DEFAULT_CELLS.CONDITIONS
     };
 
     console.log("Validating configuration with:", config);
@@ -419,7 +470,8 @@ function validateConfiguration(spreadsheetId, settingsSheetName) {
       settings: {
         hasValidToken: settings.botApiToken && settings.botApiToken.length > 20,
         sheetName: settings.formResponsesSheetName,
-        customTitle: settings.customTitle
+        customTitle: settings.customTitle,
+        conditions: settings.conditions
       },
       warnings: [],
       errors: []
