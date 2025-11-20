@@ -34,6 +34,7 @@ A powerful and flexible Google Apps Script bot that automatically sends Telegram
 | B1 | Bot Token | `123456789:ABCdefGHIjklMNOpqrsTUVwxyz` |
 | B2 | Form Sheet Name | `Form Responses 1` |
 | B3 | Custom Title | `New Form Submission` |
+| B4 | Conditions (Optional) | `Department: Sales` |
 
 ### 3. Install the Script
 1. Open **Extensions** → **Apps Script** in your Google Sheets
@@ -91,6 +92,18 @@ Code.gs
 - **RSVP Management**: Event attendance tracking
 
 ## ⚡ Advanced Features
+
+### Conditional Notifications
+You can configure the bot to only send notifications when specific conditions are met. This is useful for filtering responses or routing notifications.
+
+In cell **B4** of your settings sheet, enter conditions in the format `Field Name: Value`. You can add multiple conditions (one per line). The notification will only be sent if **all** conditions are met.
+
+Example:
+```text
+Department: Sales
+Priority: High
+```
+In this example, a notification will only be sent if the "Department" answer is "Sales" AND the "Priority" answer is "High". If cell B4 is empty, notifications will be sent for all submissions.
 
 ### Custom Message Formatting
 Customize message appearance by modifying the `buildNotificationMessage()` function:
@@ -180,7 +193,7 @@ We welcome contributions! Please see our [Contributing Guide](CONTRIBUTING.md) f
 - [ ] **Template system** for custom message formats
 - [ ] **Webhook integration** for external services
 - [ ] **Analytics dashboard** for form submission tracking
-- [ ] **Conditional notifications** based on form responses
+- [x] **Conditional notifications** based on form responses
 - [ ] **File attachment support** for form uploads
 - [ ] **Group chat support** for team notifications
 
